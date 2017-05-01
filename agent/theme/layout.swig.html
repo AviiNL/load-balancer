@@ -6,11 +6,10 @@
     <link rel="stylesheet" href="/css/uikit.min.css">
     <script src="/js/jquery-3.2.1.min.js"></script>
     <script src="/js/uikit.min.js"></script>
-
     {% block head %}{% endblock %}
-
 </head>
 <body>
+{% include 'menu.swig.html' %}
 {% block content %}{% endblock %}
 </body>
 </html>

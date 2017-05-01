@@ -2,7 +2,10 @@ module.exports = {
     'getIndex': (req, res) => {
 
         return {
-            'Yay': 'w00t'
+            'yay': 'w00t',
+            'func' : (data) => {
+                return `${data} <a>from</a> function! ${data}`;
+            }
         };
     }
 };

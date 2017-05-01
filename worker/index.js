@@ -24,7 +24,7 @@ module.exports = (webport) => {
         message    = message.toString();
         let header = message.toString().substr(0, message.indexOf(' '));
         let data   = message.toString().substr(message.indexOf(' ') + 1);
-        switch (message) {
+        switch (header) {
             case 'PING':
                 lastPing = Date.now();
                 pong();
@@ -36,8 +36,6 @@ module.exports = (webport) => {
                 console.log(message, rinfo);
                 break;
         }
-
-        message = message.toString('ascii');
     });
 
     pong();
@@ -62,7 +60,7 @@ module.exports = (webport) => {
     };
 
     //do something when app is closing
-    process.on('exit', () => process.exit(0));
+    process.on('exit', shutdown);
 
     //catches ctrl+c event
     process.on('SIGINT', shutdown);
