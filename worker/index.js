@@ -21,9 +21,10 @@ module.exports = (webport) => {
     };
 
     socket.on('message', (message, rinfo) => {
-        message    = message.toString();
-        let header = message.toString().substr(0, message.indexOf(' '));
-        let data   = message.toString().substr(message.indexOf(' ') + 1);
+        message    = message.toString('ascii');
+        let header = message.split(' ')[0] || '';
+        let data   = message.split(' ')[1] || '';
+
         switch (header) {
             case 'PING':
                 lastPing = Date.now();

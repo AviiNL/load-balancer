@@ -18,8 +18,8 @@ server.on('message', function (message, rinfo) {
     message = message.toString('ascii');
 
     let tag    = rinfo.address + ':' + rinfo.port;
-    let header = message.substr(0, message.indexOf(' '));
-    let data   = message.substr(message.indexOf(' ') + 1);
+    let header = message.split(' ')[0] || '';
+    let data   = message.split(' ')[1] || '';
 
     //console.log(message, rinfo);
     switch (header) {
@@ -111,32 +111,16 @@ const logic = (req, res) => {
         return res.end();
     }
 
+    let ip = req.connection.remoteAddress.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d{2})?/gm);
+
+    req.headers['x-forwarded-for'] = ip[0];
+
     proxy.proxyRequest(req, res, {
         target: `http://${worker.host}:${worker.port}`,
         host:   worker.host,
         port:   worker.port
     });
 
-    proxy.once('error', (err) => {
-
-        for (let i in workers) {
-            if (!workers.hasOwnProperty(i)) {
-                continue;
-            }
-
-            // The worker returned an error, get rid of it!
-            if (workers[i].address === err.address && workers[i].port === err.port) {
-                delete workers[i];
-                console.log("Reloading!");
-                res.writeHead(200, {
-                    'refresh': 0
-                });
-                res.end();
-
-                return;// logic(req, res);
-            }
-        }
-    });
     worker.served = Date.now();
 };
 
