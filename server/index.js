@@ -7,14 +7,18 @@ const MCAST_ADDR = "224.0.1.142";
 
 let workers = {};
 
-server.bind({address: MCAST_ADDR, port: PORT, exclusive: false}, function () {
+server.bind({address: MCAST_ADDR, port: PORT, exclusive: false},  () => {
     console.log('Listening on ' + MCAST_ADDR + ':' + PORT);
     server.setBroadcast(true);
     server.setMulticastTTL(128);
     server.addMembership(MCAST_ADDR);
 });
 
-server.on('message', function (message, rinfo) {
+server.on('error', (err) => {
+    console.error(err);
+});
+
+server.on('message', (message, rinfo)  => {
     message = message.toString('ascii');
 
     let tag    = rinfo.address + ':' + rinfo.port;
@@ -33,10 +37,10 @@ server.on('message', function (message, rinfo) {
                     host:   rinfo.address,
                     port:   data,
                     served: Date.now(),
-                    rinfo: rinfo,
+                    rinfo:  rinfo,
                 };
             }
-            dgram.createSocket({type: "udp4"}).send(new Buffer('ACK'), 0, 3, rinfo.port, rinfo.address);
+            server.send(new Buffer('ACK'), 0, 3, rinfo.port, rinfo.address);
             break;
         case 'BYE':
             for (let i in workers) {
@@ -74,7 +78,7 @@ const ping = () => {
 
         workers[worker].status = 0;
 
-        dgram.createSocket({type: "udp4"}).send(new Buffer(data), 0, data.length, worker.split(':')[1], worker.split(':')[0]);
+        server.send(new Buffer(data), 0, data.length, worker.split(':')[1], worker.split(':')[0]);
     }
     setTimeout(ping, 5000);
 };
@@ -86,9 +90,6 @@ const proxy = httpProxy.createProxyServer({});
 
 const logic = (req, res) => {
     // find a worker
-    if (req.url === '/favicon.ico') {
-        return res.end();
-    }
 
     let worker;
     for (let i in workers) {
