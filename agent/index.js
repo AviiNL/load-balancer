@@ -1,6 +1,8 @@
 const dev = false;
 
-const webby = require('webby.js');
+const webby = require('../webby');
+var redis = require('redis'),
+    client = redis.createClient({host: '192.168.0.38'});
 
 let port = 8081;
 if (!dev) {
@@ -15,3 +17,5 @@ webby(port, {
     static_path:     __dirname + '/static',
     cache:           false,
 });
+
+global.db = client;
