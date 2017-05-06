@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "redis": "^2.7.1",
+    "mongoose": "^4.9.7",
     "webby.js": "^0.2.0"
   }
 }
